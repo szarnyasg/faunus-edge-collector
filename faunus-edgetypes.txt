@@ -30,7 +30,7 @@ g.makeType().name("type").dataType(String.class).indexed(Vertex.class).unique(OU
 g.stopTransaction(SUCCESS);
 
 hdfs.ls();
-hdfs.copyFromLocal(graphSonFilename, graphSonFilename);
+hdfs.copyFromLocal("hdfs/" + graphSonFilename, graphSonFilename);
 faunusConf = new Configuration();
 faunusConf.setStrings("faunus.graph.input.format", "com.thinkaurelius.faunus.formats.graphson.GraphSONInputFormat");
 faunusConf.setStrings("faunus.input.location", graphSonFilename);
@@ -42,5 +42,5 @@ groovyFilename = "EdgeTypes.groovy"
 queryProperties = "cassandra-query.properties";
 
 g = FaunusFactory.open(queryProperties);
-hdfs.copyFromLocal(groovyFilename, groovyFilename);
+hdfs.copyFromLocal("hdfs/" + groovyFilename, groovyFilename);
 g.V.script("EdgeTypes.groovy", "cassandra");
