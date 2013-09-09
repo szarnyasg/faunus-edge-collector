@@ -21,4 +21,4 @@ hdfs.create(new Path("result")).withWriter({ writer ->
 })
 hdfs.head("result", 20)
 
-hdfs.copyToLocalFile(new Path("result"), new Path("result"));
+hdfs.copyToLocalFile(new Path("result"), new Path("results-efficient-unsorted.txt"));
