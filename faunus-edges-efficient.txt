@@ -1,0 +1,24 @@
+queryProperties = "cassandra-query.properties";
+g = FaunusFactory.open(queryProperties);
+
+g.V().outE("SWITCHPOSITION_SWITCH", "ROUTE_SWITCHPOSITION", "TRACKELEMENT_SENSOR", "ROUTE_ROUTEDEFINITION") \
+     .transform('{ it.outV().next().id + ":" + it.label + ":" + it.inV().next().id }')
+
+hdfs.create(new Path("result")).withWriter({ writer ->
+    hdfs.head("output")._().transform({x = it.split(":"); [x[0].toLong(), x[1], x[2].toLong()]}).groupBy({it[0..1]}, {it[2]}).cap().next() \
+                       ._().transform{it.key << it.value}.groupBy({it[0]}, {it[1..2]}, {it[0]}).cap().next() \
+                       ._().sideEffect({ kv ->
+                              values = kv.value
+                              sorted = []
+                              ["SWITCHPOSITION_SWITCH", "ROUTE_SWITCHPOSITION", "TRACKELEMENT_SENSOR", "ROUTE_ROUTEDEFINITION"].each { label ->
+                                  index = values.indexOf(label)
+                                  sorted << label
+                                  sorted << ((index >= 0) ? values[index + 1] : [])
+                                  kv.value = sorted
+                              }
+                              writer.write(kv.key + ": " + sorted + "\n")
+                       }).iterate()
+})
+hdfs.head("result", 20)
+
+hdfs.copyToLocalFile(new Path("result"), new Path("result"));

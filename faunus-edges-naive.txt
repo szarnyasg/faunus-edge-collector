@@ -1,0 +1,8 @@
+queryProperties = "cassandra-query.properties";
+groovyFilename = "EdgeTypes.groovy"
+
+g = FaunusFactory.open(queryProperties);
+hdfs.copyFromLocal("hdfs/" + groovyFilename, groovyFilename);
+g.V.script(groovyFilename, "cassandra");
+
+hdfs.copyToLocalFile(new Path("output"), new Path("output"));
