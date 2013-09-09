@@ -5,4 +5,4 @@ g = FaunusFactory.open(queryProperties);
 hdfs.copyFromLocal("hdfs/" + groovyFilename, groovyFilename);
 g.V.script(groovyFilename, "cassandra");
 
-hdfs.copyToLocalFile(new Path("output"), new Path("output"));
+hdfs.copyToLocalFile(new Path("output"), new Path("output-naive"));
